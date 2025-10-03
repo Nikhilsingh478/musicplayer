@@ -26,7 +26,7 @@ export function NavigationMenu({
 
   return (
     <>
-      <div className="sticky top-0 z-20 bg-slate-900/80 backdrop-blur-lg border-b border-white/10">
+      <div className="sticky top-0 z-20 bg-transparent backdrop-blur-sm">
         <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
           {onBack ? (
             <button

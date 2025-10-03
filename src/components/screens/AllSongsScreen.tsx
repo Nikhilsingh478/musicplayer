@@ -107,7 +107,15 @@ function SongRow({
           className={`${isCurrentTrack ? 'text-white' : 'text-white/95'} ${
             isOverflowing ? 'song-title-marquee' : 'truncate'
           }`}
-          style={{ fontSize: '15px', fontWeight: 600, fontFamily: 'Poppins, sans-serif', lineHeight: '1.4' }}
+          style={{ 
+            fontSize: '15px', 
+            fontWeight: 600, 
+            fontFamily: 'Poppins, sans-serif', 
+            lineHeight: '1.4',
+            minHeight: '21px',
+            display: 'flex',
+            alignItems: 'center'
+          }}
         >
           {isOverflowing ? (
             <div className="marquee-container">
@@ -120,7 +128,15 @@ function SongRow({
             track.title
           )}
         </div>
-        <div className="text-white/60 truncate mt-0.5" style={{ fontSize: '13px' }}>
+        <div 
+          className="text-white/60 truncate mt-0.5" 
+          style={{ 
+            fontSize: '13px',
+            minHeight: '17px',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
           {track.artist}
         </div>
       </div>
@@ -172,10 +188,8 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
         onTrackClick(trackId);
       }
     } else {
-      // New track - play it and navigate
-      const playlistWithTrack = playlists.find((p) => p.trackIds.includes(trackId));
-      const playlistId = playlistWithTrack?.id || playlists[0]?.id || 'all';
-      playTrack(trackId, playlistId);
+      // New track - play it and navigate using 'all-songs' playlist
+      playTrack(trackId, 'all-songs');
       onTrackClick(trackId);
     }
   };
@@ -183,8 +197,8 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
   const handleDelete = async (trackId: string) => {
     try {
       await deleteTrack(trackId);
-      setTrackToDelete(null);
-      toast.success('Song deleted');
+    setTrackToDelete(null);
+    toast.success('Song deleted');
     } catch (error) {
       console.error('Failed to delete song:', error);
       toast.error('Failed to delete song');
@@ -219,15 +233,18 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Floating Elements */}
         <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: -90 }}
           animate={{ 
-            y: [0, -30, 0],
-            rotate: [0, 180, 360],
-            opacity: [0.1, 0.2, 0.1]
+            scale: [1, 1.2, 1],
+            y: [0, -30, 0, -25, 0],
+            rotate: [0, 180, 360, 540],
+            opacity: [0.1, 0.25, 0.1, 0.2, 0.1]
           }}
           transition={{ 
-            duration: 20,
+            duration: 25,
             repeat: Infinity,
-            ease: "linear"
+            ease: "linear",
+            delay: 0.5
           }}
           className="absolute top-32 right-8"
         >
@@ -235,18 +252,60 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
         </motion.div>
         
         <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: 90 }}
           animate={{ 
-            scale: [1, 1.3, 1],
-            opacity: [0.05, 0.15, 0.05]
+            scale: [1, 1.4, 1],
+            opacity: [0.05, 0.18, 0.05],
+            rotate: [0, 360, 720]
           }}
           transition={{ 
-            duration: 15,
+            duration: 18,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            delay: 1
           }}
           className="absolute bottom-40 left-12"
         >
           <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 blur-lg" />
+        </motion.div>
+
+        {/* Additional floating elements */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ 
+            scale: [1, 1.2, 1],
+            x: [0, 20, 0],
+            y: [0, -15, 0],
+            opacity: [0.08, 0.18, 0.08]
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.5
+          }}
+          className="absolute top-1/2 left-1/4"
+        >
+          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-md" />
+        </motion.div>
+
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ 
+            scale: [1, 1.3, 1],
+            x: [0, -25, 0],
+            y: [0, 20, 0],
+            opacity: [0.06, 0.16, 0.06]
+          }}
+          transition={{ 
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          className="absolute bottom-1/3 right-1/4"
+        >
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500/10 to-blue-500/10 blur-sm" />
         </motion.div>
       </div>
 
@@ -254,23 +313,44 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
       <div className="relative z-10 max-w-md mx-auto px-6 py-8 pb-24">
         {/* Enhanced Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={{ opacity: 0, y: -30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-white text-2xl font-bold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <motion.h1 
+                className="text-white text-2xl font-bold mb-1" 
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 All Songs
-              </h1>
-              <p className="text-white/60 text-sm">
+              </motion.h1>
+              <motion.p 
+                className="text-white/60 text-sm"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
                 {allTracks.length} {allTracks.length === 1 ? 'song' : 'songs'} in your library
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, scale: 0, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              whileHover={{ 
+                scale: 1.05,
+                rotate: 5,
+                boxShadow: "0 15px 30px rgba(255, 255, 255, 0.2)"
+              }}
               whileTap={{ scale: 0.95 }}
               onClick={cyclePlaybackMode}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all shadow-lg backdrop-blur-sm ${
@@ -280,8 +360,14 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
               }`}
               aria-label={`Playback mode: ${getPlaybackModeLabel()}`}
               style={{ minHeight: '44px' }}
+              transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
             >
-              {getPlaybackModeIcon()}
+              <motion.div
+                animate={{ rotate: playbackMode === 'shuffle' ? [0, 360] : 0 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                {getPlaybackModeIcon()}
+              </motion.div>
               <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Poppins, sans-serif' }}>
                 {getPlaybackModeLabel()}
               </span>
@@ -289,52 +375,76 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
           </div>
         </motion.div>
 
-        {/* Songs list */}
+        {/* Enhanced Songs list */}
         {allTracks.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
             className="text-center py-20"
           >
             <motion.div
+              initial={{ scale: 0, opacity: 0 }}
               animate={{ 
                 scale: [1, 1.1, 1],
-                rotate: [0, 10, -10, 0]
+                rotate: [0, 10, -10, 0],
+                opacity: 1
               }}
               transition={{ 
                 duration: 3,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
+                delay: 0.8
               }}
               className="mb-6 text-6xl"
             >
               🎵
             </motion.div>
-            <h2 className="text-white text-xl font-semibold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <motion.h2 
+              className="text-white text-xl font-semibold mb-3" 
+              style={{ fontFamily: 'Poppins, sans-serif' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
               Your Music Library is Empty
-            </h2>
-            <p className="text-white/60 mb-8 text-sm leading-relaxed">
+            </motion.h2>
+            <motion.p 
+              className="text-white/60 mb-8 text-sm leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+            >
               Go to a playlist and upload some music to get started
-            </p>
+            </motion.p>
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             className="space-y-3"
           >
             {allTracks.map((track, index) => (
-              <SongRow
+              <motion.div
                 key={track.id}
-                track={track}
-                index={index}
-                isCurrentTrack={currentTrackId === track.id}
-                isPlaying={isPlaying && currentTrackId === track.id}
-                onClick={() => handleTrackClick(track.id)}
-                onDelete={() => setTrackToDelete(track.id)}
-              />
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ 
+                  delay: index * 0.05 + 1, 
+                  duration: 0.5,
+                  ease: "easeOut"
+                }}
+              >
+                <SongRow
+                  track={track}
+                  index={index}
+                  isCurrentTrack={currentTrackId === track.id}
+                  isPlaying={isPlaying && currentTrackId === track.id}
+                  onClick={() => handleTrackClick(track.id)}
+                  onDelete={() => setTrackToDelete(track.id)}
+                />
+              </motion.div>
             ))}
           </motion.div>
         )}

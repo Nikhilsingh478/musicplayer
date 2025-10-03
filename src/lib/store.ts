@@ -209,11 +209,19 @@ export const useMusicStore = create<MusicStore>()(
       },
 
       playNext: () => {
-        const { currentTrackId, currentPlaylistId, playlists, playbackMode } = get();
+        const { currentTrackId, currentPlaylistId, playlists, playbackMode, tracks } = get();
         if (!currentTrackId || !currentPlaylistId) return;
 
-        const playlist = playlists.find((p) => p.id === currentPlaylistId);
-        if (!playlist || playlist.trackIds.length === 0) return;
+        let trackIds: string[] = [];
+        
+        // Handle "all-songs" playlist
+        if (currentPlaylistId === 'all-songs') {
+          trackIds = Object.keys(tracks);
+        } else {
+          const playlist = playlists.find((p) => p.id === currentPlaylistId);
+          if (!playlist || playlist.trackIds.length === 0) return;
+          trackIds = playlist.trackIds;
+        }
 
         // Repeat mode - replay current track
         if (playbackMode === 'repeat') {
@@ -221,35 +229,43 @@ export const useMusicStore = create<MusicStore>()(
           return;
         }
 
-        const currentIndex = playlist.trackIds.indexOf(currentTrackId);
+        const currentIndex = trackIds.indexOf(currentTrackId);
 
         if (playbackMode === 'shuffle') {
           // Shuffle mode - random track (not current)
-          const availableIndices = playlist.trackIds
+          const availableIndices = trackIds
             .map((_, i) => i)
             .filter((i) => i !== currentIndex);
           const randomIndex =
             availableIndices[Math.floor(Math.random() * availableIndices.length)];
           set({
-            currentTrackId: playlist.trackIds[randomIndex],
+            currentTrackId: trackIds[randomIndex],
             currentTime: 0,
           });
         } else {
           // Ordered mode
-          const nextIndex = (currentIndex + 1) % playlist.trackIds.length;
+          const nextIndex = (currentIndex + 1) % trackIds.length;
           set({
-            currentTrackId: playlist.trackIds[nextIndex],
+            currentTrackId: trackIds[nextIndex],
             currentTime: 0,
           });
         }
       },
 
       playPrevious: () => {
-        const { currentTrackId, currentPlaylistId, playlists, playbackMode } = get();
+        const { currentTrackId, currentPlaylistId, playlists, playbackMode, tracks } = get();
         if (!currentTrackId || !currentPlaylistId) return;
 
-        const playlist = playlists.find((p) => p.id === currentPlaylistId);
-        if (!playlist || playlist.trackIds.length === 0) return;
+        let trackIds: string[] = [];
+        
+        // Handle "all-songs" playlist
+        if (currentPlaylistId === 'all-songs') {
+          trackIds = Object.keys(tracks);
+        } else {
+          const playlist = playlists.find((p) => p.id === currentPlaylistId);
+          if (!playlist || playlist.trackIds.length === 0) return;
+          trackIds = playlist.trackIds;
+        }
 
         // Repeat mode - replay current track
         if (playbackMode === 'repeat') {
@@ -257,25 +273,25 @@ export const useMusicStore = create<MusicStore>()(
           return;
         }
 
-        const currentIndex = playlist.trackIds.indexOf(currentTrackId);
+        const currentIndex = trackIds.indexOf(currentTrackId);
 
         if (playbackMode === 'shuffle') {
           // Shuffle mode - random track (not current)
-          const availableIndices = playlist.trackIds
+          const availableIndices = trackIds
             .map((_, i) => i)
             .filter((i) => i !== currentIndex);
           const randomIndex =
             availableIndices[Math.floor(Math.random() * availableIndices.length)];
           set({
-            currentTrackId: playlist.trackIds[randomIndex],
+            currentTrackId: trackIds[randomIndex],
             currentTime: 0,
           });
         } else {
           // Ordered mode
           const prevIndex =
-            currentIndex === 0 ? playlist.trackIds.length - 1 : currentIndex - 1;
+            currentIndex === 0 ? trackIds.length - 1 : currentIndex - 1;
           set({
-            currentTrackId: playlist.trackIds[prevIndex],
+            currentTrackId: trackIds[prevIndex],
             currentTime: 0,
           });
         }

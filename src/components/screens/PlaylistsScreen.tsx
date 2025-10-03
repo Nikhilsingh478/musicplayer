@@ -32,15 +32,18 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Floating Music Elements */}
         <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: -180 }}
           animate={{ 
-            rotate: 360,
-            y: [0, -20, 0],
-            opacity: [0.1, 0.3, 0.1]
+            scale: [1, 1.1, 1],
+            rotate: [0, 360, 720],
+            y: [0, -20, 0, -15, 0],
+            opacity: [0.1, 0.3, 0.1, 0.25, 0.1]
           }}
           transition={{ 
-            duration: 20,
+            duration: 25,
             repeat: Infinity,
-            ease: "linear"
+            ease: "linear",
+            delay: 0.5
           }}
           className="absolute top-20 left-8"
         >
@@ -48,14 +51,18 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
         </motion.div>
         
         <motion.div
+          initial={{ scale: 0, opacity: 0, x: 50 }}
           animate={{ 
-            y: [0, 30, 0],
-            opacity: [0.1, 0.2, 0.1]
+            scale: [1, 1.2, 1],
+            y: [0, 30, 0, 25, 0],
+            x: [0, 10, -5, 0],
+            opacity: [0.1, 0.25, 0.1, 0.2, 0.1]
           }}
           transition={{ 
-            duration: 15,
+            duration: 18,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            delay: 1
           }}
           className="absolute top-40 right-12"
         >
@@ -63,112 +70,225 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
         </motion.div>
         
         <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: 180 }}
           animate={{ 
-            rotate: -360,
-            x: [0, 20, 0],
-            opacity: [0.1, 0.25, 0.1]
+            scale: [1, 1.15, 1],
+            rotate: [-360, -720, -360],
+            x: [0, 20, 0, 15, 0],
+            y: [0, -10, 5, 0],
+            opacity: [0.1, 0.25, 0.1, 0.2, 0.1]
           }}
           transition={{ 
-            duration: 25,
+            duration: 30,
             repeat: Infinity,
-            ease: "linear"
+            ease: "linear",
+            delay: 1.5
           }}
           className="absolute bottom-32 left-16"
         >
           <Music className="w-20 h-20 text-blue-400/20" />
         </motion.div>
 
-        {/* Gradient Orbs */}
+        {/* Additional floating elements with complex animations */}
         <motion.div
+          initial={{ scale: 0, opacity: 0 }}
           animate={{ 
-            scale: [1, 1.2, 1],
+            scale: [1, 1.3, 1],
+            rotate: [0, 180, 360],
             opacity: [0.05, 0.15, 0.05]
           }}
           transition={{ 
-            duration: 8,
+            duration: 20,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            delay: 2
+          }}
+          className="absolute top-1/3 left-1/4"
+        >
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-sm" />
+        </motion.div>
+
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ 
+            scale: [1, 1.4, 1],
+            y: [0, -25, 0],
+            x: [0, 15, 0],
+            opacity: [0.08, 0.18, 0.08]
+          }}
+          transition={{ 
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2.5
+          }}
+          className="absolute bottom-1/4 right-1/3"
+        >
+          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-sm" />
+        </motion.div>
+
+        {/* Enhanced Gradient Orbs */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: -90 }}
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.05, 0.2, 0.05],
+            rotate: [0, 180, 360]
+          }}
+          transition={{ 
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.8
           }}
           className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl"
         />
         
         <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: 90 }}
           animate={{ 
             scale: [1.2, 1, 1.2],
-            opacity: [0.08, 0.12, 0.08]
+            opacity: [0.08, 0.15, 0.08],
+            rotate: [360, 180, 0]
           }}
           transition={{ 
-            duration: 12,
+            duration: 18,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
+            delay: 1.2
           }}
           className="absolute bottom-1/3 left-1/3 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl"
+        />
+
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.06, 0.18, 0.06],
+            x: [0, 20, 0],
+            y: [0, -15, 0]
+          }}
+          transition={{ 
+            duration: 16,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.8
+          }}
+          className="absolute top-1/2 left-1/2 w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-lg"
         />
       </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-md mx-auto px-6 py-8 pb-24">
-        {/* Header Section */}
+        {/* Enhanced Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={{ opacity: 0, y: -30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-white text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <motion.h1 
+                className="text-white text-3xl font-bold mb-2" 
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 My Playlists
-              </h1>
-              <p className="text-white/60 text-sm">
+              </motion.h1>
+              <motion.p 
+                className="text-white/60 text-sm"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
                 {playlists.length} {playlists.length === 1 ? 'playlist' : 'playlists'}
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
             
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, scale: 0, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              whileHover={{ 
+                scale: 1.05,
+                rotate: 5,
+                boxShadow: "0 20px 40px rgba(139, 92, 246, 0.3)"
+              }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsCreateModalOpen(true)}
               className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center"
               aria-label="Create playlist"
+              transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
             >
-              <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 1 }}
+              >
+                <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </motion.div>
             </motion.button>
           </div>
         </motion.div>
-        {/* Playlists Grid */}
+        {/* Enhanced Playlists Grid */}
         {playlists.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
             className="text-center py-20"
           >
             <motion.div
+              initial={{ scale: 0, opacity: 0 }}
               animate={{ 
                 scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
+                rotate: [0, 5, -5, 0],
+                opacity: 1
               }}
               transition={{ 
                 duration: 4,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
+                delay: 0.8
               }}
               className="mb-6 text-6xl"
             >
               🎵
             </motion.div>
-            <h2 className="text-white text-xl font-semibold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <motion.h2 
+              className="text-white text-xl font-semibold mb-3" 
+              style={{ fontFamily: 'Poppins, sans-serif' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
               Start Your Music Journey
-            </h2>
-            <p className="text-white/60 mb-8 text-sm leading-relaxed">
+            </motion.h2>
+            <motion.p 
+              className="text-white/60 mb-8 text-sm leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+            >
               Create your first playlist and organize your favorite songs
-            </p>
+            </motion.p>
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 20px 40px rgba(139, 92, 246, 0.4)",
+                y: -2
+              }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsCreateModalOpen(true)}
               className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl text-white font-semibold"
+              transition={{ duration: 0.6, delay: 1.4, type: "spring", stiffness: 200 }}
             >
               Create Your First Playlist
             </motion.button>
@@ -187,18 +307,23 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
               return (
                 <motion.div
                   key={playlist.id}
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.8, rotateY: -15 }}
+                  animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0 }}
                   transition={{ 
-                    delay: index * 0.1, 
-                    duration: 0.4,
-                    ease: "easeOut"
+                    delay: index * 0.15 + 1, 
+                    duration: 0.6,
+                    ease: "easeOut",
+                    type: "spring",
+                    stiffness: 200
                   }}
                   whileHover={{ 
-                    scale: 1.02,
-                    y: -2
+                    scale: 1.05,
+                    y: -5,
+                    rotateY: 5,
+                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
                   }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
                   <PlaylistCard
                     id={playlist.id}
