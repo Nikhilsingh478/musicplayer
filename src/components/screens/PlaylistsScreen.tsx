@@ -27,7 +27,7 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 custom-scrollbar overflow-y-auto">
+    <div className="min-h-screen custom-scrollbar overflow-y-auto" style={{ background: '#6B46C1' }}>
       {/* Content */}
       <div className="max-w-md mx-auto px-5 py-6 pb-20">
         {/* Create Playlist Button */}

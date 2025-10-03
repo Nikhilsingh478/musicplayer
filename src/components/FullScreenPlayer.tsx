@@ -22,8 +22,6 @@ export function FullScreenPlayer({ onBack }: FullScreenPlayerProps) {
   const cyclePlaybackMode = useMusicStore((s) => s.cyclePlaybackMode);
 
   const [isLiked, setIsLiked] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
   const track = currentTrackId ? tracks[currentTrackId] : null;
 
@@ -63,60 +61,36 @@ export function FullScreenPlayer({ onBack }: FullScreenPlayerProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause, playNext, playPrevious, onBack]);
 
-  useEffect(() => {
-    if (!track || !audioRef.current) return;
-
-    const audio = audioRef.current;
-    audio.src = track.blobUrl;
-
-    if (isPlaying) {
-      audio.play().catch(console.error);
-    } else {
-      audio.pause();
-    }
-  }, [track, isPlaying]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      if (!isDragging) {
-        setCurrentTime(audio.currentTime);
-      }
-    };
-
-    const handleEnded = () => {
-      playNext();
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [isDragging, playNext, setCurrentTime]);
-
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!track || !audioRef.current) return;
+    if (!track) return;
+    
+    const audio = (window as any).__audioElement as HTMLAudioElement;
+    if (!audio) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = x / rect.width;
     const newTime = percentage * track.duration;
 
-    audioRef.current.currentTime = newTime;
+    audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
 
-  const handleDragEnd = () => {
-    const threshold = 100; // pixels
-    const velocity = Math.abs(x.get());
+  const handleDragEnd = (_: any, info: any) => {
+    const threshold = 80; // pixels - lower for better mobile responsiveness
+    const swipeVelocity = 400; // pixels per second - lower for easier swipes
+    
+    const offset = info.offset.x;
+    const velocity = info.velocity.x;
 
-    if (Math.abs(x.get()) > threshold) {
-      if (x.get() > 0) {
+    // Check if swipe was strong enough (either distance or velocity)
+    if (Math.abs(offset) > threshold || Math.abs(velocity) > swipeVelocity) {
+      // Always set to playing when swiping to change tracks
+      if (!isPlaying) {
+        setIsPlaying(true);
+      }
+      
+      if (offset > 0 || velocity > 0) {
         // Swipe right - previous
         playPrevious();
       } else {
@@ -125,6 +99,7 @@ export function FullScreenPlayer({ onBack }: FullScreenPlayerProps) {
       }
     }
 
+    // Smoothly reset position
     x.set(0);
   };
 
@@ -146,18 +121,19 @@ export function FullScreenPlayer({ onBack }: FullScreenPlayerProps) {
         transition: 'background 420ms cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
-      <audio ref={audioRef} />
-
-      {/* Mobile Card Container - Full Width */}
+      {/* Mobile Card Container - True Full Width */}
       <motion.div
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
+        dragDirectionLock
+        dragMomentum={false}
+        dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
         onDragEnd={handleDragEnd}
         style={{ x, rotate, opacity }}
         className="w-full h-full relative"
       >
-        <div className="w-full h-full p-5 flex flex-col relative max-w-[450px] mx-auto">
+        <div className="w-full h-full p-5 flex flex-col relative">
           {/* Vignette Overlay */}
           <div
             className="absolute inset-0 pointer-events-none"

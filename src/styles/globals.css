@@ -276,3 +276,21 @@ html {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
 }
+
+/* Touch action utilities for better mobile gesture support */
+.touch-pan-y {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.touch-none {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent pull-to-refresh on mobile for better swipe experience */
+body {
+  overscroll-behavior-y: contain;
+}

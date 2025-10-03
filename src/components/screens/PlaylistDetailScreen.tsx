@@ -107,7 +107,7 @@ function PlaylistTrackRow({
           e.stopPropagation();
           onDelete();
         }}
-        className="w-9 h-9 rounded-full bg-white/5 hover:bg-red-500/20 flex items-center justify-center transition-all active:scale-95 opacity-0 group-hover:opacity-100"
+        className="w-9 h-9 rounded-full bg-white/5 hover:bg-red-500/20 flex items-center justify-center transition-all active:scale-95 md:opacity-0 md:group-hover:opacity-100 opacity-100"
         aria-label={`Remove ${track.title} from playlist`}
         style={{ minWidth: '44px', minHeight: '44px' }}
       >
@@ -174,7 +174,7 @@ export function PlaylistDetailScreen({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 custom-scrollbar overflow-y-auto">
+    <div className="min-h-screen custom-scrollbar overflow-y-auto" style={{ background: '#7C3AED' }}>
       {/* Navigation Menu */}
       <NavigationMenu
         title={playlist.name}
@@ -202,7 +202,7 @@ export function PlaylistDetailScreen({
       </div>
 
       {/* Content */}
-      <div className="max-w-md mx-auto px-5 pb-6 space-y-6">
+      <div className="max-w-md mx-auto px-5 pb-20 space-y-6">
         {/* Upload Zone */}
         <UploadZone playlistId={playlistId} />
 
