@@ -1,6 +1,6 @@
 import { ChevronLeft, Trash2, GripVertical, Play, Pause } from 'lucide-react';
 import { useMusicStore, Track } from '../../lib/store';
-import { UploadZone } from '../UploadZone';
+import { SmallUploadButton } from '../SmallUploadButton';
 import { NavigationMenu } from '../NavigationMenu';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { formatTime, getFallbackArtwork } from '../../lib/audioUtils';
@@ -101,17 +101,17 @@ function PlaylistTrackRow({
         {formatTime(track.duration)}
       </div>
 
-      {/* Delete button */}
+      {/* Delete button - white icon */}
       <button
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
-        className="w-9 h-9 rounded-full bg-white/5 hover:bg-red-500/20 flex items-center justify-center transition-all active:scale-95 md:opacity-0 md:group-hover:opacity-100 opacity-100"
+        className="w-9 h-9 rounded-full bg-white/10 hover:bg-red-500/20 flex items-center justify-center transition-all active:scale-95 md:opacity-0 md:group-hover:opacity-100 opacity-100"
         aria-label={`Remove ${track.title} from playlist`}
         style={{ minWidth: '44px', minHeight: '44px' }}
       >
-        <Trash2 className="w-4 h-4 text-red-400" strokeWidth={2} />
+        <Trash2 className="w-4 h-4 text-white" strokeWidth={2} />
       </button>
     </div>
   );
@@ -186,7 +186,10 @@ export function PlaylistDetailScreen({
 
       {/* Playlist Actions Menu */}
       <div className="max-w-md mx-auto px-5 pt-4">
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          {/* Small Upload Icon */}
+          <SmallUploadButton playlistId={playlistId} />
+          
           <button
             onClick={() => setShowDeleteDialog(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-red-500/20 transition-all active:scale-95 group"
@@ -203,8 +206,6 @@ export function PlaylistDetailScreen({
 
       {/* Content */}
       <div className="max-w-md mx-auto px-5 pb-20 space-y-6">
-        {/* Upload Zone */}
-        <UploadZone playlistId={playlistId} />
 
         {/* Track List */}
         {playlistTracks.length === 0 ? (

@@ -4,12 +4,11 @@ import { extractMetadata, isAudioFile, isValidFileSize, FALLBACK_ARTWORKS, FALLB
 import { useMusicStore, Track } from '../lib/store';
 import { toast } from 'sonner@2.0.3';
 
-interface UploadZoneProps {
+interface SmallUploadButtonProps {
   playlistId: string;
 }
 
-export function UploadZone({ playlistId }: UploadZoneProps) {
-  const [isDragging, setIsDragging] = useState(false);
+export function SmallUploadButton({ playlistId }: SmallUploadButtonProps) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addTrackWithFile = useMusicStore((s) => s.addTrackWithFile);
@@ -79,37 +78,25 @@ export function UploadZone({ playlistId }: UploadZoneProps) {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    processFiles(e.dataTransfer.files);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     processFiles(e.target.files);
   };
 
   return (
-    <div
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onClick={() => fileInputRef.current?.click()}
-      className={`relative border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer ${
-        isDragging
-          ? 'border-white/60 bg-white/10'
-          : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40'
-      }`}
-    >
+    <>
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center"
+        aria-label="Upload music files"
+        style={{ minWidth: '44px', minHeight: '44px' }}
+      >
+        {isUploading ? (
+          <Loader2 className="w-5 h-5 text-white animate-spin" strokeWidth={2} />
+        ) : (
+          <Upload className="w-5 h-5 text-white" strokeWidth={2} />
+        )}
+      </button>
+      
       <input
         ref={fileInputRef}
         type="file"
@@ -118,29 +105,6 @@ export function UploadZone({ playlistId }: UploadZoneProps) {
         onChange={handleFileSelect}
         className="hidden"
       />
-
-      <div className="flex flex-col items-center justify-center gap-3">
-        {isUploading ? (
-          <>
-            <Loader2 className="w-12 h-12 text-white/60 animate-spin" />
-            <p className="text-white/60" style={{ fontSize: '14px' }}>
-              Processing files...
-            </p>
-          </>
-        ) : (
-          <>
-            <Upload className="w-12 h-12 text-white/60" strokeWidth={1.5} />
-            <div className="text-center">
-              <p className="text-white mb-1" style={{ fontSize: '16px', fontWeight: 600 }}>
-                Drop MP3 files here
-              </p>
-              <p className="text-white/60" style={{ fontSize: '14px' }}>
-                or click to browse
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { NavigationMenu } from './components/NavigationMenu';
 import { GlobalAudioPlayer } from './components/GlobalAudioPlayer';
 import { Toaster } from './components/ui/sonner';
 import { motion, AnimatePresence } from 'motion/react';
+import { useMusicStore } from './lib/store';
 
 type Screen =
   | { type: 'playlists' }
@@ -15,6 +16,28 @@ type Screen =
   | { type: 'player' };
 
 export default function App() {
+  const initializeFileStorage = useMusicStore((s) => s.initializeFileStorage);
+  const recreateBlobUrls = useMusicStore((s) => s.recreateBlobUrls);
+
+  // Initialize file storage and recreate blob URLs on mount
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Initialize file storage
+        await initializeFileStorage();
+        
+        // Recreate blob URLs for existing tracks
+        await recreateBlobUrls();
+        
+        console.log('App initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+      }
+    };
+    
+    initializeApp();
+  }, [initializeFileStorage, recreateBlobUrls]);
+
   // Set favicon on mount
   useEffect(() => {
     const setFavicon = () => {

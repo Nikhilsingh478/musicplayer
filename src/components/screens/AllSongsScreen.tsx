@@ -45,19 +45,30 @@ function SongRow({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.25 }}
-      className={`flex items-center gap-4 p-4 rounded-2xl transition-all group ${
+      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        delay: index * 0.05, 
+        duration: 0.4,
+        ease: "easeOut"
+      }}
+      whileHover={{ 
+        scale: 1.02,
+        y: -2
+      }}
+      whileTap={{ scale: 0.98 }}
+      className={`flex items-center gap-4 p-4 rounded-2xl transition-all group backdrop-blur-sm border ${
         isCurrentTrack
-          ? 'bg-white/15 shadow-lg'
-          : 'hover:bg-white/10'
+          ? 'bg-white/20 shadow-xl border-white/30'
+          : 'hover:bg-white/10 border-white/10'
       }`}
     >
-      {/* Artwork with play/pause button */}
-      <button
+      {/* Enhanced Artwork with play/pause button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={onClick}
-        className="w-16 h-16 rounded-xl overflow-hidden bg-black/20 flex-shrink-0 relative active:scale-95 transition-transform shadow-md"
+        className="w-16 h-16 rounded-xl overflow-hidden bg-black/20 flex-shrink-0 relative transition-all shadow-lg hover:shadow-xl"
         aria-label={isCurrentTrack && isPlaying ? `Pause ${track.title}` : `Play ${track.title}`}
         style={{ minWidth: '44px', minHeight: '44px' }}
       >
@@ -67,19 +78,27 @@ function SongRow({
           className="w-full h-full object-cover"
         />
 
-        {/* Play/Pause overlay */}
-        <div
-          className={`absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity ${
-            isCurrentTrack ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-          }`}
+        {/* Enhanced Play/Pause overlay */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: isCurrentTrack ? 1 : 0,
+            scale: isCurrentTrack ? 1 : 0.8
+          }}
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all"
         >
           {isCurrentTrack && isPlaying ? (
-            <Pause className="w-6 h-6 text-white fill-white" strokeWidth={0} />
+            <Pause className="w-6 h-6 text-white fill-white drop-shadow-lg" strokeWidth={0} />
           ) : (
-            <Play className="w-6 h-6 text-white fill-white" strokeWidth={0} />
+            <Play className="w-6 h-6 text-white fill-white drop-shadow-lg" strokeWidth={0} />
           )}
+        </motion.div>
+        
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <Play className="w-5 h-5 text-white fill-white" strokeWidth={0} />
         </div>
-      </button>
+      </motion.button>
 
       {/* Song Info */}
       <div className="flex-1 min-w-0">
@@ -111,18 +130,20 @@ function SongRow({
         {formatTime(track.duration)}
       </div>
 
-      {/* Delete button - white icon */}
-      <button
+      {/* Enhanced Delete button - white icon */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
-        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-95 md:opacity-0 md:group-hover:opacity-100 opacity-100"
+        className="w-10 h-10 rounded-full bg-white/10 hover:bg-red-500/20 flex items-center justify-center transition-all md:opacity-0 md:group-hover:opacity-100 opacity-100"
         aria-label={`Delete ${track.title}`}
         style={{ minWidth: '44px', minHeight: '44px' }}
       >
-        <Trash2 className="w-4 h-4 text-white/90" strokeWidth={2.5} />
-      </button>
+        <Trash2 className="w-4 h-4 text-white" strokeWidth={2.5} />
+      </motion.button>
     </motion.div>
   );
 }
@@ -159,10 +180,15 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
     }
   };
 
-  const handleDelete = (trackId: string) => {
-    deleteTrack(trackId);
-    setTrackToDelete(null);
-    toast.success('Song deleted');
+  const handleDelete = async (trackId: string) => {
+    try {
+      await deleteTrack(trackId);
+      setTrackToDelete(null);
+      toast.success('Song deleted');
+    } catch (error) {
+      console.error('Failed to delete song:', error);
+      toast.error('Failed to delete song');
+    }
   };
 
   const getPlaybackModeIcon = () => {
@@ -188,49 +214,117 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
   };
 
   return (
-    <div className="min-h-screen custom-scrollbar overflow-y-auto" style={{ background: '#EC4899' }}>
-      {/* Content */}
-      <div className="max-w-md mx-auto px-6 py-8 pb-24">
-        {/* Header with count and playback mode */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-white/70" style={{ fontSize: '13px', fontWeight: 500 }}>
-              {allTracks.length} {allTracks.length === 1 ? 'song' : 'songs'}
-            </p>
-          </div>
+    <div className="min-h-screen custom-scrollbar overflow-y-auto relative" style={{ background: '#0f0f23' }}>
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Floating Elements */}
+        <motion.div
+          animate={{ 
+            y: [0, -30, 0],
+            rotate: [0, 180, 360],
+            opacity: [0.1, 0.2, 0.1]
+          }}
+          transition={{ 
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-32 right-8"
+        >
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-pink-500/10 to-purple-500/10 blur-sm" />
+        </motion.div>
+        
+        <motion.div
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.05, 0.15, 0.05]
+          }}
+          transition={{ 
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-40 left-12"
+        >
+          <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 blur-lg" />
+        </motion.div>
+      </div>
 
-          <button
-            onClick={cyclePlaybackMode}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all active:scale-95 shadow-md ${
-              playbackMode !== 'ordered'
-                ? 'bg-white/25 text-white backdrop-blur-sm'
-                : 'bg-white/15 text-white/80 hover:bg-white/20'
-            }`}
-            aria-label={`Playback mode: ${getPlaybackModeLabel()}`}
-            style={{ minHeight: '40px' }}
-          >
-            {getPlaybackModeIcon()}
-            <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Poppins, sans-serif' }}>
-              {getPlaybackModeLabel()}
-            </span>
-          </button>
-        </div>
+      {/* Content */}
+      <div className="relative z-10 max-w-md mx-auto px-6 py-8 pb-24">
+        {/* Enhanced Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-white text-2xl font-bold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                All Songs
+              </h1>
+              <p className="text-white/60 text-sm">
+                {allTracks.length} {allTracks.length === 1 ? 'song' : 'songs'} in your library
+              </p>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={cyclePlaybackMode}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all shadow-lg backdrop-blur-sm ${
+                playbackMode !== 'ordered'
+                  ? 'bg-white/25 text-white border border-white/20'
+                  : 'bg-white/15 text-white/80 hover:bg-white/20 border border-white/10'
+              }`}
+              aria-label={`Playback mode: ${getPlaybackModeLabel()}`}
+              style={{ minHeight: '44px' }}
+            >
+              {getPlaybackModeIcon()}
+              <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Poppins, sans-serif' }}>
+                {getPlaybackModeLabel()}
+              </span>
+            </motion.button>
+          </div>
+        </motion.div>
 
         {/* Songs list */}
         {allTracks.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="mb-6 text-white/30" style={{ fontSize: '64px' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center py-20"
+          >
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="mb-6 text-6xl"
+            >
               🎵
-            </div>
-            <p className="text-white/70" style={{ fontSize: '17px', fontWeight: 600, fontFamily: 'Poppins, sans-serif' }}>
-              No songs yet
+            </motion.div>
+            <h2 className="text-white text-xl font-semibold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Your Music Library is Empty
+            </h2>
+            <p className="text-white/60 mb-8 text-sm leading-relaxed">
+              Go to a playlist and upload some music to get started
             </p>
-            <p className="text-white/50 mt-2" style={{ fontSize: '14px' }}>
-              Go to a playlist and upload some music
-            </p>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-2">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="space-y-3"
+          >
             {allTracks.map((track, index) => (
               <SongRow
                 key={track.id}
@@ -242,7 +336,7 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
                 onDelete={() => setTrackToDelete(track.id)}
               />
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
 

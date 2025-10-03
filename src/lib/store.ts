@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { fileStorage, fallbackFileStorage, isIndexedDBSupported } from './fileStorage';
 
 export interface Track {
   id: string;
@@ -11,7 +12,7 @@ export interface Track {
   artworkUrl?: string;
   dominantColor: string;
   blobUrl: string;
-  file?: File;
+  fileId?: string; // Reference to stored file
 }
 
 export interface Playlist {
@@ -45,7 +46,7 @@ interface MusicStore {
   addTrack: (track: Track) => void;
   addTracksToPlaylist: (playlistId: string, trackIds: string[]) => void;
   removeTrackFromPlaylist: (playlistId: string, trackId: string) => void;
-  deleteTrack: (trackId: string) => void;
+  deleteTrack: (trackId: string) => Promise<void>;
   reorderPlaylistTracks: (playlistId: string, trackIds: string[]) => void;
   
   // Actions - Player
@@ -57,6 +58,11 @@ interface MusicStore {
   setIsPlaying: (playing: boolean) => void;
   setPlaybackMode: (mode: PlaybackMode) => void;
   cyclePlaybackMode: () => void;
+  
+  // Actions - File Management
+  initializeFileStorage: () => Promise<void>;
+  recreateBlobUrls: () => Promise<void>;
+  addTrackWithFile: (track: Track, file: File) => Promise<void>;
 }
 
 export const useMusicStore = create<MusicStore>()(
@@ -137,8 +143,25 @@ export const useMusicStore = create<MusicStore>()(
         });
       },
 
-      deleteTrack: (trackId) => {
+      deleteTrack: async (trackId) => {
         const { tracks, playlists, currentTrackId } = get();
+        const track = tracks[trackId];
+        
+        // Remove stored file if it exists
+        if (track?.fileId) {
+          try {
+            const storage = isIndexedDBSupported() ? fileStorage : fallbackFileStorage;
+            await storage.deleteFile(track.fileId);
+            console.log(`Deleted stored file for track: ${track.title}`);
+          } catch (error) {
+            console.error('Failed to delete stored file:', error);
+          }
+        }
+        
+        // Revoke blob URL to free memory
+        if (track?.blobUrl && track.blobUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(track.blobUrl);
+        }
         
         // Remove from all playlists
         const updatedPlaylists = playlists.map((p) => ({
@@ -276,6 +299,92 @@ export const useMusicStore = create<MusicStore>()(
         const currentIndex = modes.indexOf(playbackMode);
         const nextIndex = (currentIndex + 1) % modes.length;
         set({ playbackMode: modes[nextIndex] });
+      },
+
+      // File Management Actions
+      initializeFileStorage: async () => {
+        try {
+          if (isIndexedDBSupported()) {
+            await fileStorage.init();
+          }
+          console.log('File storage initialized');
+        } catch (error) {
+          console.error('Failed to initialize file storage:', error);
+        }
+      },
+
+      recreateBlobUrls: async () => {
+        const { tracks } = get();
+        const updatedTracks = { ...tracks };
+        
+        try {
+          const storage = isIndexedDBSupported() ? fileStorage : fallbackFileStorage;
+          
+          for (const trackId in tracks) {
+            const track = tracks[trackId];
+            if (track.fileId && track.blobUrl.startsWith('blob:')) {
+              // Try to recreate blob URL from stored file
+              const storedFile = await storage.getFile(track.fileId);
+              if (storedFile) {
+                const newBlobUrl = URL.createObjectURL(storedFile.file);
+                updatedTracks[trackId] = {
+                  ...track,
+                  blobUrl: newBlobUrl,
+                };
+                console.log(`Recreated blob URL for track: ${track.title}`);
+              } else {
+                console.warn(`Could not find stored file for track: ${track.title}`);
+              }
+            }
+          }
+          
+          set({ tracks: updatedTracks });
+        } catch (error) {
+          console.error('Failed to recreate blob URLs:', error);
+        }
+      },
+
+      addTrackWithFile: async (track, file) => {
+        try {
+          const storage = isIndexedDBSupported() ? fileStorage : fallbackFileStorage;
+          
+          // Store the file
+          const fileId = await storage.storeFile(file, {
+            title: track.title,
+            artist: track.artist,
+            album: track.album,
+            year: track.year,
+            duration: track.duration,
+            artworkUrl: track.artworkUrl,
+            dominantColor: track.dominantColor,
+          });
+          
+          // Create track with file reference
+          const trackWithFile = {
+            ...track,
+            fileId,
+            blobUrl: URL.createObjectURL(file),
+          };
+          
+          // Add to store
+          set({
+            tracks: {
+              ...get().tracks,
+              [track.id]: trackWithFile,
+            },
+          });
+          
+          console.log(`Track stored with file ID: ${fileId}`);
+        } catch (error) {
+          console.error('Failed to store track with file:', error);
+          // Fallback to regular track storage
+          set({
+            tracks: {
+              ...get().tracks,
+              [track.id]: track,
+            },
+          });
+        }
       },
     }),
     {
