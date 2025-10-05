@@ -215,9 +215,8 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
             <motion.button
               initial={{ opacity: 0, scale: 0, rotate: -180 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.05,
-                rotate: 5,
                 boxShadow: "0 20px 40px rgba(139, 92, 246, 0.3)"
               }}
               whileTap={{ scale: 0.95 }}
@@ -226,12 +225,7 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
               aria-label="Create playlist"
               transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
             >
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 1 }}
-              >
-                <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-              </motion.div>
+              <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
             </motion.button>
           </div>
         </motion.div>
@@ -341,16 +335,19 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
 
       {/* Create Playlist Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="bg-slate-800 border-white/20">
+        <DialogContent className="bg-slate-900 border-white/30 shadow-2xl" style={{ background: 'linear-gradient(135deg, rgba(30, 11, 46, 0.95) 0%, rgba(15, 15, 35, 0.95) 100%)' }}>
           <DialogHeader>
-            <DialogTitle className="text-white">Create New Playlist</DialogTitle>
+            <DialogTitle className="text-white text-xl" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>
+              Create New Playlist
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <Input
               value={newPlaylistName}
               onChange={(e) => setNewPlaylistName(e.target.value)}
               placeholder="Playlist name (optional)"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+              className="bg-white/10 border-white/30 text-white placeholder:text-white/50 focus:border-white/50 focus:ring-2 focus:ring-white/20 rounded-xl py-3"
+              style={{ fontFamily: 'Poppins, sans-serif' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleCreatePlaylist();
@@ -358,15 +355,20 @@ export function PlaylistsScreen({ onPlaylistClick }: PlaylistsScreenProps) {
               }}
               autoFocus
             />
-            <div className="flex gap-3 justify-end">
+            <div className="flex gap-3 justify-end pt-2">
               <Button
                 variant="outline"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-white/30 text-white hover:bg-white/20 bg-white/10 rounded-xl px-6 py-2.5 font-semibold transition-all"
+                style={{ fontFamily: 'Poppins, sans-serif', minHeight: '44px' }}
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreatePlaylist} className="bg-white text-black hover:bg-white/90">
+              <Button
+                onClick={handleCreatePlaylist}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl px-6 py-2.5 font-semibold shadow-lg transition-all"
+                style={{ fontFamily: 'Poppins, sans-serif', minHeight: '44px' }}
+              >
                 Create
               </Button>
             </div>

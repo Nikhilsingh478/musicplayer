@@ -41,21 +41,27 @@ export default function App() {
   // Set favicon on mount
   useEffect(() => {
     const setFavicon = () => {
-      // Create an SVG favicon with a music note
+      // Create an SVG favicon with a modern music disc/vinyl design
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-          <rect width="100" height="100" rx="20" fill="url(#grad)"/>
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#1a0b2e;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#0f0f23;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="musicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
               <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
             </linearGradient>
           </defs>
-          <path d="M65 25v35c0 8.28-6.72 15-15 15s-15-6.72-15-15 6.72-15 15-15c3.31 0 6.38 1.08 8.86 2.9V25c0-2.76 2.24-5 5-5h1.14c2.76 0 5 2.24 5 5z" fill="white"/>
-          <circle cx="50" cy="60" r="10" fill="white" opacity="0.3"/>
+          <rect width="100" height="100" rx="22" fill="url(#grad)"/>
+          <circle cx="50" cy="50" r="32" fill="url(#musicGrad)" opacity="0.9"/>
+          <circle cx="50" cy="50" r="24" fill="#1a0b2e" opacity="0.5"/>
+          <circle cx="50" cy="50" r="8" fill="url(#musicGrad)"/>
+          <path d="M62 38v18c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6c1.32 0 2.55.43 3.54 1.16V38c0-1.1.9-2 2-2h.46c1.1 0 2 .9 2 2z" fill="white" opacity="0.95"/>
         </svg>
       `.trim();
-      
+
       const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
       if (favicon) {
         favicon.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
@@ -65,11 +71,11 @@ export default function App() {
         newFavicon.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
         document.head.appendChild(newFavicon);
       }
-      
+
       // Also set title
       document.title = 'Music Player';
     };
-    
+
     setFavicon();
   }, []);
   const [screen, setScreen] = useState<Screen>({ type: 'playlists' });

@@ -228,7 +228,7 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
   };
 
   return (
-    <div className="min-h-screen custom-scrollbar overflow-y-auto relative" style={{ background: '#0f0f23' }}>
+    <div className="min-h-screen custom-scrollbar overflow-y-auto relative" style={{ background: '#1a0b2e' }}>
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Floating Elements */}

@@ -213,7 +213,7 @@ export const useMusicStore = create<MusicStore>()(
         if (!currentTrackId || !currentPlaylistId) return;
 
         let trackIds: string[] = [];
-        
+
         // Handle "all-songs" playlist
         if (currentPlaylistId === 'all-songs') {
           trackIds = Object.keys(tracks);
@@ -243,7 +243,7 @@ export const useMusicStore = create<MusicStore>()(
             currentTime: 0,
           });
         } else {
-          // Ordered mode
+          // Ordered mode - ALWAYS loop back to first song after last song
           const nextIndex = (currentIndex + 1) % trackIds.length;
           set({
             currentTrackId: trackIds[nextIndex],

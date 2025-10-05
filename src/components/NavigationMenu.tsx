@@ -83,7 +83,8 @@ export function NavigationMenu({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 h-full w-64 bg-slate-800 border-l border-white/10 shadow-2xl z-50"
+              className="fixed top-0 right-0 h-full w-64 border-l border-white/10 shadow-2xl z-50"
+              style={{ background: 'linear-gradient(180deg, rgba(26, 11, 46, 0.98) 0%, rgba(15, 15, 35, 0.98) 100%)' }}
             >
               <div className="p-6 space-y-2">
                 <div className="mb-6">
