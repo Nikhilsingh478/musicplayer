@@ -344,12 +344,11 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
             </motion.div>
 
             <motion.button
-              initial={{ opacity: 0, scale: 0, rotate: -180 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              whileHover={{ 
-                scale: 1.05,
-                rotate: 5,
-                boxShadow: "0 15px 30px rgba(255, 255, 255, 0.2)"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{
+                scale: 1.08,
+                transition: { duration: 0.2, ease: "easeOut" }
               }}
               whileTap={{ scale: 0.95 }}
               onClick={cyclePlaybackMode}
@@ -360,14 +359,9 @@ export function AllSongsScreen({ onTrackClick }: AllSongsScreenProps) {
               }`}
               aria-label={`Playback mode: ${getPlaybackModeLabel()}`}
               style={{ minHeight: '44px' }}
-              transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200 }}
+              transition={{ duration: 0.4, delay: 0.5, ease: "easeOut" }}
             >
-              <motion.div
-                animate={{ rotate: playbackMode === 'shuffle' ? [0, 360] : 0 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                {getPlaybackModeIcon()}
-              </motion.div>
+              {getPlaybackModeIcon()}
               <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Poppins, sans-serif' }}>
                 {getPlaybackModeLabel()}
               </span>

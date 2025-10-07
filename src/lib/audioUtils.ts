@@ -193,25 +193,48 @@ async function extractID3Tags(file: File): Promise<Partial<AudioMetadata>> {
           if (frameSize > 0 && offset + frameSize <= buffer.byteLength) {
             const encoding = view.getUint8(offset);
             const textData = new Uint8Array(buffer, offset + 1, frameSize - 1);
-            
+
             let text = '';
-            if (encoding === 0 || encoding === 3) {
-              // ISO-8859-1 or UTF-8
-              text = new TextDecoder('utf-8').decode(textData);
-            } else if (encoding === 1) {
-              // UTF-16 with BOM
-              text = new TextDecoder('utf-16').decode(textData);
+            try {
+              if (encoding === 0) {
+                // ISO-8859-1 (Latin-1)
+                text = new TextDecoder('latin1').decode(textData);
+              } else if (encoding === 1) {
+                // UTF-16 with BOM
+                text = new TextDecoder('utf-16').decode(textData);
+              } else if (encoding === 2) {
+                // UTF-16BE without BOM
+                text = new TextDecoder('utf-16be').decode(textData);
+              } else if (encoding === 3) {
+                // UTF-8
+                text = new TextDecoder('utf-8').decode(textData);
+              }
+            } catch (e) {
+              // Fallback to UTF-8 if decoding fails
+              try {
+                text = new TextDecoder('utf-8').decode(textData);
+              } catch {
+                console.warn('Failed to decode text frame:', frameId);
+              }
             }
-            
-            // Remove null terminators
-            text = text.replace(/\x00+$/, '');
-            
+
+            // Remove null terminators and clean up
+            text = text.replace(/\x00+$/, '').trim();
+
             // Map frame IDs to metadata
-            if (frameId === 'TIT2') metadata.title = text;
-            else if (frameId === 'TPE1') metadata.artist = text;
-            else if (frameId === 'TALB') metadata.album = text;
-            else if (frameId === 'TYER' || frameId === 'TDRC') {
-              metadata.year = text.substring(0, 4);
+            if (frameId === 'TIT2' && text) {
+              metadata.title = text;
+            } else if (frameId === 'TPE1' && text) {
+              metadata.artist = text;
+            } else if (frameId === 'TPE2' && text && !metadata.artist) {
+              metadata.artist = text;
+            } else if (frameId === 'TALB' && text) {
+              metadata.album = text;
+            } else if ((frameId === 'TYER' || frameId === 'TDRC') && text) {
+              const yearMatch = text.match(/\d{4}/);
+              if (yearMatch) {
+                metadata.year = yearMatch[0];
+              }
             }
             else if (frameId === 'APIC') {
               // Extract artwork
@@ -249,19 +272,36 @@ async function extractID3Tags(file: File): Promise<Partial<AudioMetadata>> {
 
 /**
  * Parse filename to extract title and artist
- * Supports formats like "Artist - Title.mp3" or "Title.mp3"
+ * Supports formats like "Artist - Title.mp3", "01 Artist - Title.mp3", or "Title.mp3"
  */
 function parseFilename(filename: string): { title: string; artist?: string } {
   // Remove extension
-  const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
-  
+  let nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+
+  // Remove common track number prefixes (e.g., "01 ", "01. ", "1 - ")
+  nameWithoutExt = nameWithoutExt.replace(/^\d+[\s.-]+/, '');
+
   // Check for "Artist - Title" format
   if (nameWithoutExt.includes(' - ')) {
-    const [artist, title] = nameWithoutExt.split(' - ');
-    return { title: title.trim(), artist: artist.trim() };
+    const parts = nameWithoutExt.split(' - ');
+    if (parts.length >= 2) {
+      const artist = parts[0].trim();
+      const title = parts.slice(1).join(' - ').trim();
+      return { title, artist };
+    }
   }
-  
-  return { title: nameWithoutExt };
+
+  // Check for "Artist_Title" format
+  if (nameWithoutExt.includes('_')) {
+    const parts = nameWithoutExt.split('_');
+    if (parts.length >= 2) {
+      const artist = parts[0].trim();
+      const title = parts.slice(1).join(' ').trim();
+      return { title, artist };
+    }
+  }
+
+  return { title: nameWithoutExt.trim() };
 }
 
 /**

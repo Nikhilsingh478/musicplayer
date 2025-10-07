@@ -63,24 +63,34 @@ export function GlobalAudioPlayer() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
     };
-    
+
     const handleEnded = () => {
-      playNext();
+      const playbackMode = useMusicStore.getState().playbackMode;
+
+      if (playbackMode === 'repeat') {
+        audio.currentTime = 0;
+        audio.play().catch((error) => {
+          console.error('Auto-replay error:', error);
+          setIsPlaying(false);
+        });
+      } else {
+        playNext();
+      }
     };
-    
+
     const handleError = (e: ErrorEvent) => {
       console.error('Audio error:', e);
       setIsPlaying(false);
     };
-    
+
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError as any);
-    
+
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
